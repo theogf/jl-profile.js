@@ -666,6 +666,9 @@ export class ProfileViewer {
     if (node.flags & 0x10) {
       // C frame
       a = 0.5
+    } else if (node.flags & 0x11) {
+      // runtime in compilation profiling.
+      a = 0.0
     }
     return {
       fill: 'rgba(' + r + ',' + g + ',' + b + ',' + a + ')',
