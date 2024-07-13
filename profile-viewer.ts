@@ -809,7 +809,11 @@ export class ProfileViewer {
     const flags = []
 
     if (node.flags & RuntimeDispatch) {
-      flags.push('runtime-dispatch')
+      if (node.flags & SnoopCompile) {
+        flags.push('not precompilable')
+      } else { 
+        flags.push('runtime-dispatch')
+      }
     }
     if (node.flags & GCEvent) {
       if (node.flags & SnoopCompile) {
