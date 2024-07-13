@@ -4,7 +4,8 @@ const GCEvent = 0x02;
 const REPL = 0x04;
 const Compilation = 0x08;
 const TaskEvent = 0x10;
-const Ignore = 0x20;
+const SnoopCompile = 0x20;
+const Ignore = 0x40;
 export class ProfileViewer {
     constructor(element, data, selectorLabel) {
         this.selections = [];
@@ -589,7 +590,12 @@ export class ProfileViewer {
             flags.push('runtime-dispatch');
         }
         if (node.flags & GCEvent) {
-            flags.push('GC');
+            if (node.flags & SnoopCompile) {
+                flags.push('constant propagation');
+            }
+            else {
+                flags.push('GC');
+            }
         }
         if (node.flags & Compilation) {
             flags.push('compilation');
