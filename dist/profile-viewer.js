@@ -5,7 +5,7 @@ const REPL = 0x04;
 const Compilation = 0x08;
 const TaskEvent = 0x10;
 const SnoopCompile = 0x20;
-const Ignore = 0x40;
+const Invisible = 0x40;
 export class ProfileViewer {
     constructor(element, data, selectorLabel) {
         this.selections = [];
@@ -501,7 +501,7 @@ export class ProfileViewer {
             // C frame
             a = 0.5;
         }
-        else if (node.flags & Ignore) {
+        else if (node.flags & Invisible) {
             // Runtime in compilation profiling.
             // We make it entirely transparent.
             a = 0.0;
@@ -641,7 +641,7 @@ export class ProfileViewer {
     }
     runOnNodeAtMousePosition(root, x, y, f) {
         // Ignored nodes should not trigger any action.
-        if (root.flags & Ignore) {
+        if (root.flags & Invisible) {
             return false;
         }
         if (x >= Math.floor(root.pos.x) &&

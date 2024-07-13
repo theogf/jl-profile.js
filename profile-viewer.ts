@@ -31,7 +31,7 @@ const REPL = 0x04
 const Compilation = 0x08
 const TaskEvent = 0x10
 const SnoopCompile = 0x20
-const Ignore = 0x40
+const Invisible = 0x40
 
 export class ProfileViewer {
   private data: Record<string, ProfileNode>
@@ -675,7 +675,7 @@ export class ProfileViewer {
     if (node.flags & TaskEvent) {
       // C frame
       a = 0.5
-    } else if (node.flags & Ignore) {
+    } else if (node.flags & Invisible) {
       // Runtime in compilation profiling.
       // We make it entirely transparent.
       a = 0.0
@@ -883,7 +883,7 @@ export class ProfileViewer {
     f: (node: ProfileNode) => void
   ) {
     // Ignored nodes should not trigger any action.
-    if (root.flags & Ignore) {
+    if (root.flags & Invisible) {
       return false
     }
     if (
