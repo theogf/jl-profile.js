@@ -24,6 +24,14 @@ interface TooltipElementContainer {
   flags: HTMLElement
 }
 
+// Constant flags for color and tooltip
+const RuntimeDispatch = 0x01
+const GCEvent = 0x02
+const REPL = 0x04
+const Compilation = 0x08
+const TaskEvent = 0x10
+const Ignore = 0x20
+
 export class ProfileViewer {
   private data: Record<string, ProfileNode>
   private currentSelection: string
@@ -650,24 +658,25 @@ export class ProfileViewer {
   private nodeColors(node: ProfileNode, hash: number) {
     let r: number, g: number, b: number
     let a = 1
-    if (node.flags & 0x01) {
+    if (node.flags & RuntimeDispatch) {
       // runtime-dispatch
       ;({ r, g, b } = this.modifyNodeColorByHash(204, 103, 103, hash, 20))
-    } else if (node.flags & 0x02) {
+    } else if (node.flags & GCEvent) {
       // gc
       ;({ r, g, b } = this.modifyNodeColorByHash(204, 153, 68, hash, 20))
-    } else if (node.flags & 0x08) {
+    } else if (node.flags & Compilation) {
       // compilation?
       ;({ r, g, b } = this.modifyNodeColorByHash(100, 100, 100, hash, 60))
     } else {
       // default
       ;({ r, g, b } = this.modifyNodeColorByHash(64, 99, 221, hash))
     }
-    if (node.flags & 0x10) {
+    if (node.flags & TaskEvent) {
       // C frame
       a = 0.5
-    } else if (node.flags & 0x11) {
-      // runtime in compilation profiling.
+    } else if (node.flags & Ignore) {
+      // Runtime in compilation profiling.
+      // We make it entirely transparent.
       a = 0.0
     }
     return {
@@ -798,16 +807,16 @@ export class ProfileViewer {
 
     const flags = []
 
-    if (node.flags & 0x01) {
+    if (node.flags & RuntimeDispatch) {
       flags.push('runtime-dispatch')
     }
-    if (node.flags & 0x02) {
+    if (node.flags & GCEvent) {
       flags.push('GC')
     }
-    if (node.flags & 0x08) {
+    if (node.flags & Compilation) {
       flags.push('compilation')
     }
-    if (node.flags & 0x10) {
+    if (node.flags & TaskEvent) {
       flags.push('task')
     }
     let flagString = ''
@@ -864,6 +873,10 @@ export class ProfileViewer {
     y: number,
     f: (node: ProfileNode) => void
   ) {
+    // Ignored nodes should not trigger any action.
+    if (root.flags & Ignore) {
+      return false
+    }
     if (
       x >= Math.floor(root.pos.x) &&
       x <= Math.ceil(root.pos.x + root.pos.width) &&
